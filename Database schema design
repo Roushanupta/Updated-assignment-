@@ -1,0 +1,31 @@
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+
+Base = declarative_base()
+
+class Supplier(Base):
+    __tablename__ = 'suppliers'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    contact_info = Column(String)
+    product_categories = Column(String)
+
+class Product(Base):
+    __tablename__ = 'products'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    brand = Column(String)
+    price = Column(Float)
+    category = Column(String)
+    description = Column(String)
+    supplier_id = Column(Integer, ForeignKey('suppliers.id'))
+    supplier = relationship('Supplier', back_populates='products')
+
+Supplier.products = relationship('Product', order_by=Product.id, back_populates='supplier')
+
+# Database connection
+engine = create_engine('mysql+pymysql://username:password@localhost/dbname')
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
