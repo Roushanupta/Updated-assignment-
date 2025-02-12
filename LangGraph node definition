@@ -1,0 +1,30 @@
+from langgraph import Node, Graph
+from langchain.llms import OpenAI
+from sqlalchemy.orm import Session
+
+# Initialize the LLM
+llm = OpenAI(model_name="gpt-3.5-turbo")
+
+# Node to fetch products by brand
+def fetch_products_by_brand(state):
+    brand = state['brand']
+    products = session.query(Product).filter(Product.brand == brand).all()
+    product_list = [f"{product.name} - ${product.price}" for product in products]
+    return {"products": product_list}
+
+# Node to fetch suppliers by product category
+def fetch_suppliers_by_category(state):
+    category = state['category']
+    suppliers = session.query(Supplier).filter(Supplier.product_categories.contains(category)).all()
+    supplier_list = [supplier.name for supplier in suppliers]
+    return {"suppliers": supplier_list}
+
+# Node to summarize supplier information using LLM
+def summarize_supplier_info(state):
+    supplier_name = state['supplier_name']
+    supplier = session.query(Supplier).filter(Supplier.name == supplier_name).first()
+    if supplier:
+        info = f"Supplier Name: {supplier.name}\nContact Info: {supplier.contact_info}\nProduct Categories: {supplier.product_categories}"
+        summary = llm.generate(info)
+        return {"summary": summary}
+    return {"summary": "Supplier not found."}
