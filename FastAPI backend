@@ -1,0 +1,16 @@
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Query(BaseModel):
+    user_input: str
+
+@app.post("/chat")
+async def chat(query: Query):
+    user_input = query.user_input
+    # Process user input to extract entities (brand, category, supplier_name)
+    # This can be done using NLP techniques or predefined keywords
+    state = {"user_input": user_input}
+    result = graph.run(state)
+    return result
