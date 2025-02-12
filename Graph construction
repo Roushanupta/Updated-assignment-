@@ -1,0 +1,14 @@
+fetch_products_node = Node(fetch_products_by_brand)
+fetch_suppliers_node = Node(fetch_suppliers_by_category)
+summarize_supplier_node = Node(summarize_supplier_info)
+
+# Create the graph
+graph = Graph()
+graph.add_node("FetchProducts", fetch_products_node)
+graph.add_node("FetchSuppliers", fetch_suppliers_node)
+graph.add_node("SummarizeSupplier", summarize_supplier_node)
+
+# Define edges based on user intent
+graph.add_edge("UserQuery", "FetchProducts", condition=lambda state: 'brand' in state)
+graph.add_edge("UserQuery", "FetchSuppliers", condition=lambda state: 'category' in state)
+graph.add_edge("UserQuery", "SummarizeSupplier", condition=lambda state: 'supplier_name' in state)
